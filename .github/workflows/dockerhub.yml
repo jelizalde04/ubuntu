@@ -1,0 +1,44 @@
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the files
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: joeli2104
+          password: dckr_pat_DmUhFEgIsRqESxTWAumB7e5_LU4
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t joeli2104/ubuntu:latest .
+          docker push joeli210/ubuntu:latest
+
+  deploy:
+    name: Deploy to Local Machine (Optional Step)
+    runs-on: ubuntu-latest
+    needs: build  # Ensure deployment only occurs after the build job is successful
+
+    steps:
+      - name: Checkout the files
+        uses: actions/checkout@v2
+
+      - name: Pull and Run Docker Container Locally
+        run: |
+          # Pull the latest Docker image from DockerHub
+          docker pull joeli210/ubuntu:latest
+
+          # Run the Docker container locally
+          docker run -d -p 80:80 joeli210/ubuntu:latest
